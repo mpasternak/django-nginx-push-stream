@@ -1,0 +1,10 @@
+version: '2'
+services:
+  nginx_http_push_stream:
+    build:
+      dockerfile: Dockerfile
+      context: docker
+    image: mpasternak79/nginx-http-push-stream:1.12.0
+    ports:
+      - "9080:80"
+      - "9443:443"

@@ -33,7 +33,6 @@
         testApp.clearOutput();
         testApp.writeLine("Ready. ");
         testApp.setStatus("");
-        console.log(csrftoken);
         testApp.init(
             "{% url "message_received" %}",
             csrftoken,
@@ -43,7 +42,6 @@
         );
 
         testApp.subscribe("__all__");
-
 
         testApp.connect();
 

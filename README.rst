@@ -83,11 +83,10 @@ How to send the message to Nginx pubsub queue
 .. code-block:: shell
 
    $ cd test_project
-   python manage.py test test_app.tests.TestNginxPushStream.test_publish_message
+   $ python manage.py publish_message  -q __all__  -d '{"message": ["Foobar"]}'
 
-
-This will send a short message to a queue called ``my-app-foo``. To see code responsible for it,
-please check file ``test_app/tests.py`` .
+This will send a short message to a queue called ``__all__`` which should include all
+users of the site, logged-in or not.
 
 Listening for messages
 ----------------------
@@ -95,11 +94,21 @@ Listening for messages
 You can listen for messages sent in the above step. Assuming you are using the
 default configuration:
 
+* with a browser:
+
+  .. code-block:: shell
+
+      $ cd test_project
+      $ python manage.py runserver
+
+  Now open http://127.0.0.1:8000 in your web browser to see the example app
+  in action.
+
 * with ``curl``:
 
   .. code-block:: shell
 
-      $ curl -s -v --no-buffer 'http://localhost:9080/sub/my-app-foo'
+      $ curl -s -v --no-buffer 'http://localhost:9080/sub/my-app__all__'
 
 * with `websocket-client`_:
 
@@ -112,11 +121,15 @@ default configuration:
   .. code-block:: python
 
       from websocket import create_connection
-      ws = create_connection("ws://localhost:9080/ws/my-app-foo/")
+      ws = create_connection("ws://localhost:9080/ws/my-app__all__")
       print("Listening...")
       result = ws.recv()
       print("Received '%s'" % result)
       ws.close()
+
+As you probably already know, the ``__all__`` string portion of URL is the name of
+a queue. ``my-app`` is a prefix, that can be configured by changing
+``NGINX_PUSH_STREAM_PUB_PREFIX``.
 
 ``curl(1)``? Great! So why do I need a Django app for, exactly?
 ===============================================================
@@ -127,10 +140,12 @@ users of your Django-based website:
 * send message to a specific Django session: browser subscribes to a channel with
   name based on session id (as shown in test_project),
 
+* send message to all users (as shown in test_project),
+
+Not yet shown in examples (patches accepted): 
+
 * send message to all logged-in users: make logged in users subscribe to a queue
   for logged in users,
-
-* send message to all users (as shown in test_project),
 
 * give an UUID for every single web page that gets rendered by your server and send
   messages only to this page (with help of `django-template-uuid`_)

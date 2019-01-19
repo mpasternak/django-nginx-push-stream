@@ -10,25 +10,14 @@ Quick introduction
 
 2. You can install Nginx binaries which include it:
 
-   * on Ubuntu via `unofficial PPA`_
-   * on macOS via `Homebrew`_
+   * on Ubuntu via `unofficial PPA`_,
+   * on macOS via `Homebrew`_,
+   * many more, perhaps (patches accepted).
 
-3. For development, you can run it by installing `Docker`_, cloning this repo and typing
-   ``docker-compose up``. This command will build the Docker image containing Nginx with `Nginx Push Stream Module`_ and
+3. For development with `Docker`_, clone this repo and type ``docker-compose up``.
+   This command will build the Docker image containing Nginx with `Nginx Push Stream Module`_ and
    start it up. By default, port 80 of Docker container is being mapped to port 9080 of your
    local machine (see `docker-compose.yml`_ for details)
-
-  .. code-block:: shell
-
-    $  docker-compose up
-    Creating network "django-nginx-push-stream_default" with the default driver
-    Creating django-nginx-push-stream_nginx_http_push_stream_1 ... done
-    Attaching to django-nginx-push-stream_nginx_http_push_stream_1
-    nginx_http_push_stream_1  | ==> /var/log/nginx/access.log <==
-    nginx_http_push_stream_1  |
-    nginx_http_push_stream_1  | ==> /var/log/nginx/error.log <==
-    nginx_http_push_stream_1  | 2019/01/15 23:26:42 [info] 8#8: Using 32768KiB of shared memory for push stream module on zone: push_stream_module in /etc/nginx/nginx.conf:15
-
 
 4. This package, django-nginx-push-stream, is an attempt to unleash the power of the Nginx Push
    Stream Module from Django application.
@@ -64,7 +53,18 @@ and more as a separate module.
 Booting your infrastructure
 ===========================
 
-Run docker server by typing ``docker-compose up -d`` in the root directory. Then:
+Run docker server by typing ``docker-compose up -d`` in the root directory.
+
+  .. code-block:: shell
+
+    $  docker-compose up
+    Creating network "django-nginx-push-stream_default" with the default driver
+    Creating django-nginx-push-stream_nginx_http_push_stream_1 ... done
+    Attaching to django-nginx-push-stream_nginx_http_push_stream_1
+    nginx_http_push_stream_1  | ==> /var/log/nginx/access.log <==
+    nginx_http_push_stream_1  |
+    nginx_http_push_stream_1  | ==> /var/log/nginx/error.log <==
+    nginx_http_push_stream_1  | 2019/01/15 23:26:42 [info] 8#8: Using 32768KiB of shared memory for push stream module on zone: push_stream_module in /etc/nginx/nginx.conf:15
 
 Example application
 ===================
@@ -72,6 +72,7 @@ Example application
 .. code-block:: shell
 
    $ cd test_project
+   $ pip install -r requirements.txt
    $ python manage.py runserver
 
 Details
@@ -128,7 +129,9 @@ default configuration:
       ws.close()
 
 As you probably already know, the ``__all__`` string portion of URL is the name of
-a queue. ``my-app`` is a prefix, that can be configured by changing
+a queue.
+
+``my-app`` is a prefix, that can be configured by changing
 ``NGINX_PUSH_STREAM_PUB_PREFIX``.
 
 ``curl(1)``? Great! So why do I need a Django app for, exactly?
@@ -137,12 +140,12 @@ a queue. ``my-app`` is a prefix, that can be configured by changing
 This package makes it easier to send information to specific sessions or all
 users of your Django-based website:
 
+* send message to all users.
+
+Not yet shown in examples (patches accepted):
+
 * send message to a specific Django session: browser subscribes to a channel with
   name based on session id (as shown in test_project),
-
-* send message to all users (as shown in test_project),
-
-Not yet shown in examples (patches accepted): 
 
 * send message to all logged-in users: make logged in users subscribe to a queue
   for logged in users,
@@ -163,7 +166,7 @@ WebSockets vs SSE
 =================
 
 `Nginx Push Stream Module`_ offers sending messages over both WebSockets and EventSource (SSE).
-You can read about those two different approaches on `StackOverflow`_.
+You can read about those two different methods in a great comment at `StackOverflow`_.
 
 .. _Nginx Push Stream Module: https://github.com/wandenberg/nginx-push-stream-module .
 .. _unofficial PPA: https://launchpad.net/~dotz/+archive/ubuntu/nginx-with-push-stream-module

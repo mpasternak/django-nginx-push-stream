@@ -1,0 +1,57 @@
+{% load static sessionid %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="{% static "nginx_push_stream/js/pushstream.js" %}"></script>
+    <script src="{% static "test_app/js/test_app.js" %}"></script>
+</head>
+<body>
+
+<textarea id="output" rows="20" cols="80"></textarea><br/>
+
+<input type="text" size="80"
+       placeholder="Type your message, then press enter..." onkeypress="handleLine(this);"
+       id="input"/><br/>
+
+<input type="text" size="160" placeholder="Server response will be displayed here" readonly="" id="status"/><br/>
+
+{% csrf_token %}
+
+<script>
+    var csrftoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    var sessionid = "{{ request.session.session_key|default:"" }}";
+
+    function handleLine(event) {
+        if (event.keyCode == 13) {
+            var input = document.getElementById("input");
+            testApp.sendMessage(input.value);
+            input.value = '';
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        testApp.clearOutput();
+        testApp.writeLine("Ready. ");
+        testApp.setStatus("");
+        console.log(csrftoken);
+        testApp.init(
+            "{% url "message_received" %}",
+            csrftoken,
+            "{{ NGINX_PUSH_STREAM_PUB_PREFIX }}",
+            "{{ NGINX_PUSH_STREAM_HOST}}",
+            "{{ NGINX_PUSH_STREAM_PORT }}"
+        );
+
+        testApp.subscribe("__all__");
+
+
+        testApp.connect();
+
+        var input = document.getElementById("input");
+        input.addEventListener("keyup", handleLine);
+    });
+
+</script>
+
+</body>
+</html>

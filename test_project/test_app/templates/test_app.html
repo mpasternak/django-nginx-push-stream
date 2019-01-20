@@ -41,7 +41,18 @@
             "{{ NGINX_PUSH_STREAM_PORT }}"
         );
 
+        /* Subscribe to a queue for all users, authorised or not */
         testApp.subscribe("__all__");
+
+        /* In case the user is logged in, subscribe to a queue for logged-in users and a queue
+           named after a specific session ID, so the notifications can be sent to that specific
+           session ID. At the moment of this writing, the actual checking if the user is really
+           authorised and authenticated to use those queues is not yet implemented in nginx
+           configuration... */
+        if (sessionid !== "") {
+            testApp.subscribe("__authorized__");
+            testApp.subscribe("__session__" + sessionid);
+        }
 
         testApp.connect();
 

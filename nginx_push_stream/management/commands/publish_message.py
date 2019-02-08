@@ -7,7 +7,7 @@ from nginx_push_stream.core import publish_message
 
 
 class Command(BaseCommand):
-    help = 'Sends a message to the specified queue"
+    help = 'Sends a message to the specified queue'
     args = '<username> <message>'
 
     def add_arguments(self, parser):

@@ -25,8 +25,6 @@ SECRET_KEY = 'f!#ok=w$jl5jzg)=y(aorw&bzjwm59)q*41x%v0f)v#g2xk(s+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -122,7 +120,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR + '/staticroot'
 
-# Default port of docker image nginx:
+NGINX_PUSH_STREAM_PUB_HOST = os.getenv("NGINX_PUSH_STREAM_PUB_HOST", "localhost")
+NGINX_PUSH_STREAM_PUB_PORT = os.getenv("NGINX_PUSH_STREAM_PUB_PORT", "9080")
 
-NGINX_PUSH_STREAM_PORT = 9080
+# Assuming you're running ``docker-compose up`` in the repo root dir:
+
+# 127.0.0.1:9080 is the port of the nginx host, as seen from your local host
+
+NGINX_PUSH_STREAM_SUB_HOST = "127.0.0.1"
+NGINX_PUSH_STREAM_SUB_PORT = 9080
+
+ALLOWED_HOSTS = ["127.0.0.1", "appserver"]
+

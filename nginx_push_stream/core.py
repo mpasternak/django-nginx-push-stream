@@ -12,10 +12,10 @@ def get_pub_path(s):
     return {"id": prefix + s}
 
 
-def build_url(pub_path):
+def build_pub_url(pub_path):
     proto = getattr(settings, "NGINX_PUSH_STREAM_PROTOCOL")
-    host = getattr(settings, "NGINX_PUSH_STREAM_HOST")
-    port = getattr(settings, "NGINX_PUSH_STREAM_PORT")
+    host = getattr(settings, "NGINX_PUSH_STREAM_PUB_HOST")
+    port = getattr(settings, "NGINX_PUSH_STREAM_PUB_PORT")
     url = urlunparse(
         (proto, f"{host}:{port}", "pub/", "", urlencode(get_pub_path(pub_path)), "")
     )
@@ -23,7 +23,7 @@ def build_url(pub_path):
 
 
 def publish_message(pub_path, **message):
-    url = build_url(pub_path)
+    url = build_pub_url(pub_path)
     message_json = json.dumps(message).encode('utf-8')
     req = request.Request(url, data=message_json)
     req.add_header('Content-Type', 'application/json; charset=utf-8')

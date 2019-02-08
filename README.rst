@@ -82,7 +82,9 @@ Run docker server by typing ``docker-compose up -d`` in the root directory.
     appserver_1  | [uwsgi-static] added mapping for /static => /app/test_project/staticroot
     [... lots of text...]
 
-Go to http://127.0.0.1:9080/ to see the application in action.
+Go to http://127.0.0.1:9080/ to see the application in action. It is a simple chat application.
+Type any message, press ENTER. It will broadcast the message to all the subscribers. You can
+subscribe using other methods, than a web browser (see below). 
 
 Details
 =======

@@ -11,8 +11,21 @@ Quick introduction
 2. You can install Nginx binaries which include it:
 
    * on Ubuntu via `unofficial PPA`_,
-   * on macOS via `Homebrew`_,
-   * many more, perhaps (patches accepted).
+
+     .. code-block:: shell
+
+       $ sudo add-apt-repository ppa:dotz/nginx-with-push-stream-module
+       $ sudo apt-get update
+       $ sudo apt-get install nginx
+
+   * on macOS via `Homebrew`_ with `homebrew-nginx tap`_,
+
+     .. code-block:: shell
+
+       $ brew tap denji/nginx
+       $ brew install nginx-full --with-push-stream-module --with-auth-req
+
+   * possibly many more (help me improve this documentation, please).
 
 3. For development with `Docker`_, clone this repo and type ``docker-compose up``.
    This command will build the Docker image containing Nginx with `Nginx Push Stream Module`_ and
@@ -36,49 +49,45 @@ Design
 
 django-nginx-push-stream consists of:
 
-* configuration settings in conf/settings.py,
-* calls in the `core.py` module
+* configuration settings in ``conf/settings.py``,
+* calls in the ``core.py`` module,
+* a small ``auth`` view defined in ``auth.py``, which can decide if an user is allowed to subscribe
+  to a channel
+* there's also an example nginx container (``docker/default`` and ``docker/Dockerfile-nginx``)
+* there's also an example project (``test_project``) that can be run.
 
 django-nginx-push-stream describes ways how to subscribe and then
 how to send push notifications to Django's:
 
 * anonymous users,
-* logged-in sessions
+* logged-in sessions,
+* all authorised (looged-in) sessions.
 
 There's a very bare example project provided. You can extend its functionality
 to fit it to a specific purpose. A project will be provided, that extends the
 basic functionality in order to bring graphics notifications, progress dialogs
 and more as a separate module.
 
-Booting your infrastructure
-===========================
+Booting example infrastructure
+==============================
 
 Run docker server by typing ``docker-compose up -d`` in the root directory.
 
   .. code-block:: shell
 
     $  docker-compose up
-    Creating network "django-nginx-push-stream_default" with the default driver
-    Creating django-nginx-push-stream_nginx_http_push_stream_1 ... done
-    Attaching to django-nginx-push-stream_nginx_http_push_stream_1
-    nginx_http_push_stream_1  | ==> /var/log/nginx/access.log <==
-    nginx_http_push_stream_1  |
-    nginx_http_push_stream_1  | ==> /var/log/nginx/error.log <==
-    nginx_http_push_stream_1  | 2019/01/15 23:26:42 [info] 8#8: Using 32768KiB of shared memory for push stream module on zone: push_stream_module in /etc/nginx/nginx.conf:15
+    Starting django-nginx-push-stream_appserver_1 ... done
+    Starting django-nginx-push-stream_webserver_1 ... done
+    Attaching to django-nginx-push-stream_appserver_1, django-nginx-push-stream_webserver_1
+    appserver_1  | [uwsgi-static] added mapping for /static => /app/test_project/staticroot
+    [... lots of text...]
 
-Example application
-===================
-
-.. code-block:: shell
-
-   $ cd test_project
-   $ pip install -r requirements.txt
-   $ python manage.py runserver
+Go to http://127.0.0.1:9080/ to see the application in action.
 
 Details
 =======
 
-How to send the message to Nginx pubsub queue
+How to send the message to nginx pubsub queue
 ---------------------------------------------
 
 .. code-block:: shell
@@ -92,17 +101,10 @@ users of the site, logged-in or not.
 Listening for messages
 ----------------------
 
-You can listen for messages sent in the above step. Assuming you are using the
-default configuration:
+You can listen for messages sent in the above step. Assuming you have started the
+default configuration using ``docker-compose``:
 
-* with a browser:
-
-  .. code-block:: shell
-
-      $ cd test_project
-      $ python manage.py runserver
-
-  Now open http://127.0.0.1:8000 in your web browser to see the example app
+* with a browser: open http://127.0.0.1:9080 in your web browser to see the example app
   in action.
 
 * with ``curl``:
@@ -142,8 +144,6 @@ users of your Django-based website:
 
 * send message to all users.
 
-Not yet shown in examples (patches accepted):
-
 * send message to a specific Django session: browser subscribes to a channel with
   name based on session id (as shown in test_project),
 
@@ -151,16 +151,19 @@ Not yet shown in examples (patches accepted):
   for logged in users,
 
 * give an UUID for every single web page that gets rendered by your server and send
-  messages only to this page (with help of `django-template-uuid`_)
+  messages only to this page (with help of `django-template-uuid`_) - not yet shown
+  in examples (patches accepted!)
 
 Security
 ========
 
 Anyone can subscribe to a queue with the default configuration. So, a malicous attacker
 could subscribe and read users private information. How to avoid this? Nginx documentation
-has a section about `Authentication based on subrequest result`_ . Currently this is not
-shown or documented in example code of this project and it definitely could be. Patches
-welcome.
+has a section about `Authentication based on subrequest result`_ .
+
+The default example configuration also includes ``auth_request`` setup in nginx in
+such way, that it will internally ask the Django application if a given user has
+enough credentials to subscribe to a queue.
 
 WebSockets vs SSE
 =================
@@ -178,3 +181,4 @@ You can read about those two different methods in a great comment at `StackOverf
 .. _django-template-uuid: https://github.com/mpasternak/django-template-uuid
 .. _Authentication based on subrequest result: https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subrequest-authentication/
 .. _StackOverflow: https://stackoverflow.com/questions/5195452/websockets-vs-server-sent-events-eventsource#5326159
+.. _homebrew-nginx tap: https://denji.github.io/homebrew-nginx/

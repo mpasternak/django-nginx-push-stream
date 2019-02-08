@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from nginx_push_stream.auth import auth_request
 from test_app.views import TestAppView, message_received
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TestAppView.as_view()),
-    path('message_received', message_received, name="message_received")
+    path('message_received', message_received, name="message_received"),
+    path('websocket-auth/', auth_request, name="auth")
 ]

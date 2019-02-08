@@ -8,13 +8,17 @@ RUN add-apt-repository -y "ppa:dotz/nginx-with-push-stream-module" || true
 
 RUN apt-get -qq update \ 
   && DEBIAN_FRONTEND=noninteractive apt-get -qq install -y --allow-unauthenticated \
-     nginx-full=1.12.0-1+xenial1+pushtream0
+     nginx-full=1.14.1-0+xenial0+pushstream1
 
 COPY default /etc/nginx/sites-available
 COPY nginx.conf /etc/nginx/
 
 EXPOSE 80
 
-RUN nginx -t
+# It would be really cool to run this command to check configuration
+# at the build time... BUT, at the build time, Docker knows absolutely
+# no hosts, so this will fail, because host "appserver" does not exist
+# (yet!) (mpasternak)
+# RUN nginx -t
 
 ENTRYPOINT nginx && tail -f /var/log/nginx/*

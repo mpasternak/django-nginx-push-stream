@@ -37,8 +37,8 @@
             "{% url "message_received" %}",
             csrftoken,
             "{{ NGINX_PUSH_STREAM_PUB_PREFIX }}",
-            "{{ NGINX_PUSH_STREAM_HOST}}",
-            "{{ NGINX_PUSH_STREAM_PORT }}"
+            "{{ NGINX_PUSH_STREAM_SUB_HOST}}",
+            "{{ NGINX_PUSH_STREAM_SUB_PORT }}"
         );
 
         /* Subscribe to a queue for all users, authorised or not */

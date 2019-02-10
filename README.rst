@@ -3,6 +3,10 @@ django-nginx-push-stream
 
 Django support library for `Nginx Push Stream Module`_.
 
+.. image:: https://travis-ci.org/mpasternak/django-nginx-push-stream.svg?branch=master
+	   :target: https://travis-ci.org/mpasternak/django-nginx-push-stream
+
+	      
 Quick introduction
 ==================
 
